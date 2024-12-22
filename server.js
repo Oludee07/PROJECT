@@ -4,7 +4,7 @@ const usersRouter = require('./routes/v1/users');
 
 
 const app = express();
-const PORT = 3000;
+const PORT = 4000;
 
 //ADD RESTRICTED ACCESS WHEN URL(DOMAIN) IS IMPLEMENTED
 // const corsOptions = {
