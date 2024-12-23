@@ -1,7 +1,4 @@
-//const express = require('express');
 const User = require('../../models/User');
-
-//const users = []; //simulate database
 
 //@desc POST Create a new user
 //@route POST /v1/users
@@ -9,16 +6,16 @@ const User = require('../../models/User');
 
 const createUserHandler = async (req , res) =>{
     try{
-      let {name, gender, age, email} = req.body;
+      let {name, gender, email, age} = req.body;
       const lowerCasegender = gender.toLowerCase();
 
-      if(typeof name !=='string'){
+      if(typeof name !== 'string'){
         res.status(400).json({message: 'name must be letters'});
         return;
       }
 
-      if(typeof gender !=='string'){
-        res.status(400).json({message: 'name must be letters'});
+      if(typeof gender !== 'string'){
+        res.status(400).json({ message: 'gender must be letters'});
         return;
 
       }else if(lowerCasegender !== 'male' && lowerCasegender !== 'female'){
@@ -44,19 +41,10 @@ const createUserHandler = async (req , res) =>{
         return;
       }
 
-       const user = User.build({ name: name, gender: lowerCasegender, age: age, email: email });
+       const user = User.build({ name: name, gender: lowerCasegender, email: email, age: age });
        await user.save();
 
-      // const user = {
-      //   id: users.length,
-      //   name:name,
-      //   gender:gender,
-      //   age:age,
-      //   email: email
-     // };
-
-              
-      //users.push(user);
+      
        res.status(201).json({message: 'user created successfully', user});
   
 
@@ -65,7 +53,7 @@ const createUserHandler = async (req , res) =>{
 
 
     }catch(error){
-      res.status(500).json({message: error});
+      res.status(500).json({message: error.message});
     }
 
 };
@@ -80,7 +68,7 @@ const getUsersHandler = async (req, res) =>{
       res.status(200).json(users);
   
     }catch(error){
-      res.status(500).json({message: message.error})
+      res.status(500).json({message: error.message})
     }
   };
   
@@ -91,21 +79,22 @@ const getUsersHandler = async (req, res) =>{
   const getUserHandler = async (req, res) =>{
     try{
       const id = Number(req.params.id);
-      if(typeof id != 'number'){
+      if(typeof id != 'number' || isNaN(id)){
         res.status(400).json( {message: 'Id must be a number'});
         return;
       }
-      const users = await User.findOne({where: {id: id} });
-      if(!users){
+      const user = await User.findOne({where: {id: id} });
+    
+      if(!user){
         res.status(400).json( {message: 'user not found'});
         return;
       
       }
       
-      res.status(200).json(users);
+      res.status(200).json(user);
   
     }catch(error){
-      res.status(500).json({message: message.error})
+      res.status(500).json({message: error.message})
     }
   };
   
@@ -116,13 +105,15 @@ const getUsersHandler = async (req, res) =>{
   
   const updateUserHandler = async (req, res) =>{
     try{
-      const id = req.params.id;
-      const {name, gender, age, email} = req.body;
-  
-      if (id >= users.length){
-        res.status(404).json({message: 'user not found'});
+      const id = Number(req.params.id);
+      const {name, gender, email, age} = req.body;
+      const lowerCasegender = gender.toLowerCase();
+
+      if(typeof id != 'number' || isNaN(id)){
+        res.status(400).json( {message: 'Id must be a number'});
         return;
-    };
+      }  
+       
       if(typeof name !=='string'){
         res.status(400).json({message: 'name must be letters'});
         return;
@@ -150,21 +141,27 @@ const getUsersHandler = async (req, res) =>{
         res.status(400).json({message: 'You must be at least 15yrs to register'});
         return;
       }
-  
-      // const user = {
-      //   id: users.length,
-      //   name:name,
-      //   gender:gender,
-      //   age:age,
-      //   email: email
-      // };
+
+      const user = await User.findOne({where: {id: id} });
     
-      // users[id] = user;
+      if(!user){
+        res.status(400).json( {message: 'user not found'});
+        return;
+      }
+
+      user.name= name;
+      user.gender= gender;
+      user.email= email;
+      user.age= age;
+
+      await user.save();
+  
+      
       res.status(200).json(user);
       return;
   
     }catch(error){
-      res.status(500).json({message: message.error})
+      res.status(500).json({message: error.message})
     }
   };
   
@@ -175,16 +172,23 @@ const getUsersHandler = async (req, res) =>{
   
   const deleteUserHandler = async (req, res) =>{
     try{
-      const id =req.params.id;
-      if (id >= users.length){
-      res.status(404).json({message: 'user not found'});
-      return;
-    }
-      users.splice(id, 1);
+      const id = Number(req.params.id);
+    
+      if(typeof id != 'number' || isNaN(id)){
+        res.status(400).json( {message: 'Id must be a number'});
+        return;
+      }
+      const user = await User.findOne({where: {id: id} });
+    
+      if(!user){
+        res.status(400).json( {message: 'user not found'});
+        return;
+      }
+      await user.destroy();
       res.status(200).json({message: 'user deleted successfully'})
       
     }catch(error){
-      res.status(500).json({message: message.error})
+      res.status(500).json({message: error.message})
     }
   };
   
