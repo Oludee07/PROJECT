@@ -1,5 +1,11 @@
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken'); 
+const dotenv = require('dotenv' );
+
+//Loads env environment var from env file
+
+ dotenv.config();
 
 //@desc POST Create a new user
 //@route POST /v1/users
@@ -50,9 +56,9 @@ const createUserHandler = async (req , res) =>{
         return;
       }
 
-      const hashedPassword = await bcrypt.hash( password, 15);
+      const hashedPassword = await bcrypt.hash( password, 10);
 
-       const user = User.build({ name: name, gender: lowerCasegender, email: email, age: age });
+       const user = User.build({ name: name, gender: lowerCasegender, email: email, age: age, password: password });
        await user.save();
 
       
@@ -202,18 +208,52 @@ const getUsersHandler = async (req, res) =>{
       res.status(500).json({message: error.message})
     }
   };
+
+  //@desc POST Login user
+  //@route POST /v1/users/login
+  //@access PUBLIC
+
+  const loginUserHandler = async (req, res) => {
+    const { email, password} = req.body;
+    const SECRET_KEY = process.env.JWT_SECRET_KEY;
+
+    const user = await User.findOne({ where: {email : email}});
+    if( !user) {
+      res.status(404).json({ message: 'User does not exist'});
+      return;
+
+    }
+
+    const isPasswordValid = await bcrypt.compare( password, user.password);
+
+    if( !isPasswordValid) {
+      res.status(404).json({ message: 'Invalid Passowrd'});
+      return;
+    }
+
+    const payload = {
+      id: user.id,
+      email: user.email,
+    }
+
+    const accessToken = jwt.sign( payload, SECRET_KEY, {expiresIn: '1h'});
+    const refreshToken = jwt.sign( payload, SECRET_KEY, {expiresIn: '7d'});
+
+    res.status(200).json({ accessToken, refreshToken})
+
+  };
+
+
   
-  
-  
-  
-  
+
   
   module.exports = {
     createUserHandler,
     getUsersHandler,
     getUserHandler,
     updateUserHandler,
-    deleteUserHandler
+    deleteUserHandler,
+    loginUserHandler
   
   };
   

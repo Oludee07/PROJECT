@@ -6,20 +6,19 @@ const {
   getUserHandler,
   updateUserHandler,
   deleteUserHandler,
+  loginUserHandler
 } = require("../../controllers/v1/userController");
 
-//const users = []; //simulated database
+router.get('/', getUsersHandler);
 
-router.get("/", getUsersHandler);
+router.get('/:id', getUserHandler);
 
+router.post('/', createUserHandler);
 
-router.get("/:id", getUserHandler);
+router.put('/:id', updateUserHandler);
 
-//we need HTTP client to test(insomnia,postman)
-router.post("/", createUserHandler);
+router.delete('/:id', deleteUserHandler);
 
-router.put("/:id", updateUserHandler);
-
-router.delete("/:id", deleteUserHandler);
+router.post('/:login', loginUserHandler);
 
 module.exports = router;
