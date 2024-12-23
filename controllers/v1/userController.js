@@ -1,4 +1,5 @@
 const User = require('../../models/User');
+const bcrypt = require('bcryptjs');
 
 //@desc POST Create a new user
 //@route POST /v1/users
@@ -6,7 +7,7 @@ const User = require('../../models/User');
 
 const createUserHandler = async (req , res) =>{
     try{
-      let {name, gender, email, age} = req.body;
+      let {name, gender, email, age, password} = req.body;
       const lowerCasegender = gender.toLowerCase();
 
       if(typeof name !== 'string'){
@@ -40,6 +41,16 @@ const createUserHandler = async (req , res) =>{
         res.status(400).json({message: 'You must be at least 15yrs to register'});
         return;
       }
+
+      if(typeof password !== 'string'){
+        res.status(400).json({message: 'password must be letters'});
+        return;
+      }else if (password.length < 8) {
+        res.status(400).json({message: 'password must be at least 8 characters'});
+        return;
+      }
+
+      const hashedPassword = await bcrypt.hash( password, 15);
 
        const user = User.build({ name: name, gender: lowerCasegender, email: email, age: age });
        await user.save();
