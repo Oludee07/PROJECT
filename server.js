@@ -1,6 +1,6 @@
-const express = require('express');
-const cors = require('cors');
-const usersRouter = require('./routes/v1/users');
+const express = require("express");
+const cors = require("cors");
+const usersRouter = require("./routes/v1/users");
 
 
 const app = express();
