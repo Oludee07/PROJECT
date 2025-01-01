@@ -234,7 +234,7 @@ const loginUserHandler = async (req, res) => {
     email: user.email,
   };
 
-  const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+  const accessToken = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
   const refreshToken = jwt.sign(payload, SECRET_KEY, { expiresIn: "7d" });
 
   res.status(200).json({ accessToken, refreshToken });
