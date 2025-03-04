@@ -12,14 +12,14 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  gender: {
+  accountType: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  age: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
+  // age: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull: false,
+  // },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -33,7 +33,6 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-
 
   createdAt: {
     type: DataTypes.DATE,
