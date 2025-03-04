@@ -13,19 +13,21 @@ dotenv.config();
 
 const createUserHandler = async (req, res) => {
   try {
-    let { name, gender, email, age, password } = req.body;
-    const lowerCasegender = gender.toLowerCase();
+    let { name, email, accountType, password } = req.body;
+    // const lowerCasegender = gender.toLowerCase();
 
     if (typeof name !== "string") {
       res.status(400).json({ message: "name must be letters" });
       return;
     }
 
-    if (typeof gender !== "string") {
-      res.status(400).json({ message: "gender must be letters" });
+    if (typeof accountType !== "string") {
+      res.status(400).json({ message: "Account must be letters" });
       return;
-    } else if (lowerCasegender !== "male" && lowerCasegender !== "female") {
-      res.status(400).json({ message: "gender must be either male or female" });
+    } else if (accountType != "Individual" && accountType != "Owner") {
+      res
+        .status(400)
+        .json({ message: "Account type should be individual or owner" });
       return;
     }
     if (typeof email !== "string") {
@@ -36,15 +38,15 @@ const createUserHandler = async (req, res) => {
       return;
     }
 
-    if (typeof age !== "number") {
-      res.status(400).json({ message: "age must be a number" });
-      return;
-    } else if (age < 15) {
-      res
-        .status(400)
-        .json({ message: "You must be at least 15yrs to register" });
-      return;
-    }
+    // if (typeof age !== "number") {
+    //   res.status(400).json({ message: "age must be a number" });
+    //   return;
+    // } else if (age < 15) {
+    //   res
+    //     .status(400)
+    //     .json({ message: "You must be at least 15yrs to register" });
+    //   return;
+    // }
 
     if (typeof password !== "string") {
       res.status(400).json({ message: "password must be letters" });
@@ -60,9 +62,9 @@ const createUserHandler = async (req, res) => {
 
     const user = User.build({
       name: name,
-      gender: lowerCasegender,
+      accountType: accountType,
       email: email,
-      age: age,
+      accountType: accountType,
       password: hashedPassword,
     });
     await user.save();
@@ -119,8 +121,8 @@ const getUserHandler = async (req, res) => {
 const updateUserHandler = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { name, gender, email, age } = req.body;
-    const lowerCasegender = gender.toLowerCase();
+    const { name, accountType, email } = req.body;
+    // const lowerCasegender = gender.toLowerCase();
 
     if (typeof id != "number" || isNaN(id)) {
       res.status(400).json({ message: "Id must be a number" });
@@ -132,14 +134,16 @@ const updateUserHandler = async (req, res) => {
       return;
     }
 
-    if (typeof gender !== "string") {
+    if (typeof accountType !== "string") {
       res.status(400).json({ message: "name must be letters" });
       return;
     } else if (
-      gender.toLowerCase() !== "male" &&
-      gender.toLowerCase() !== "female"
+      accountType.toLowerCase() !== "Individual" &&
+      accountType.toLowerCase() !== "Owner"
     ) {
-      res.status(400).json({ message: "gender must be either male or female" });
+      res
+        .status(400)
+        .json({ message: "Account type must be either Individual or Owner" });
       return;
     }
     if (typeof email !== "string") {
@@ -150,15 +154,15 @@ const updateUserHandler = async (req, res) => {
       return;
     }
 
-    if (typeof age !== "number") {
-      res.status(400).json({ message: "age must be a number" });
-      return;
-    } else if (age < 15) {
-      res
-        .status(400)
-        .json({ message: "You must be at least 15yrs to register" });
-      return;
-    }
+    // if (typeof age !== "number") {
+    //   res.status(400).json({ message: "age must be a number" });
+    //   return;
+    // } else if (age < 15) {
+    //   res
+    //     .status(400)
+    //     .json({ message: "You must be at least 15yrs to register" });
+    //   return;
+    // }
 
     const user = await User.findOne({ where: { id: id } });
 
@@ -168,9 +172,9 @@ const updateUserHandler = async (req, res) => {
     }
 
     user.name = name;
-    user.gender = gender;
+    user.accountType = accountType;
     user.email = email;
-    user.age = age;
+    // user.age = age;
 
     await user.save();
 
